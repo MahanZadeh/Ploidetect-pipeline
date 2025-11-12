@@ -35,7 +35,7 @@ set -euo pipefail
 [[ -d $5 ]] || mkdir $5
 #
 # First get vcf of all heterozygous germline SNPs
-samtools mpileup $1 -l $4 -f $3 -v -B | bcftools call -c | grep "0/1" > $5/het_snps.vcf
+bcftools mpileup $1 --regions-file $4 -f $3 -B | bcftools call -c | grep "0/1" > $5/het_snps.vcf
 #
 # Get positions of heterozygous snps for mpileup
 cut -f1,2 $5/het_snps.vcf > $5/het_snp_positions.txt
