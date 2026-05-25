@@ -76,7 +76,7 @@ if not genome_fasta:
 # Snakemake can match the combined "somatic_normal" segment as a single
 # `{normal}` wildcard, triggering AmbiguousRuleException or a KeyError when
 # the config["bams"][...]["normal"][w.normal] lookup fails.
-_LIB_ID = r"[A-Za-z0-9.\-]+"
+_LIB_ID = r"[A-Z0-9]+"
 
 
 wildcard_constraints:
@@ -86,7 +86,7 @@ wildcard_constraints:
 
 ruleorder: genomecovgermline > germline_cov
 
-
+_LIB_ID = r"[A-Z0-9]+"
 include: "defaults.smk"
 
 
