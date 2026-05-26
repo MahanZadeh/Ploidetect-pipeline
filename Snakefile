@@ -71,6 +71,22 @@ if not genome_fasta:
         )
 
 
+# Disambiguate paths between `germline_cov` (…/{normal}/normal/{chr}.bed) and
+# `genomecovgermline` (…/{somatic}_{normal}/normal/{chr}.bed). Without this,
+# Snakemake can match the combined "somatic_normal" segment as a single
+# `{normal}` wildcard, triggering AmbiguousRuleException or a KeyError when
+# the config["bams"][...]["normal"][w.normal] lookup fails.
+_LIB_ID = r"[A-Z0-9]+"
+
+
+wildcard_constraints:
+    somatic=_LIB_ID,
+    normal=_LIB_ID,
+
+
+ruleorder: genomecovgermline > germline_cov
+
+_LIB_ID = r"[A-Z0-9]+"
 include: "defaults.smk"
 
 
@@ -275,7 +291,6 @@ rule germline_cov:
     """
     input:
         bam=lambda w: config["bams"][w.case]["normal"][w.normal],
-        output_dir=output_dir,
     output:
         temp("{output_dir}/scratch/{case}/{normal}/normal/{chr}.bed"),
     resources:

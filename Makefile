@@ -9,17 +9,23 @@ PYTHON_VER=3.11
 # Some kind of Pulp error with snakemake 8.27
 SNAKEMAKE_VER='snakemake<8.2'
 
-conda_venv:  ## download and install miniconda & mamba. To use 'source venv_conda/bin/activate'
-	wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
-	bash miniconda.sh -b -u -p $(VENV_CONDA)
-	$(VENV_CONDA)/bin/conda install --yes python=$(PYTHON_VER) pip
-	$(VENV_CONDA)/bin/pip install -U pip
 
-conda_snakemake:  ## conda install of snakemake into a new '$(VENV_CONDA)'.  After 'source venv/bin/activate'
-	# Only snakemake is really needed but other modules are useful for dev.
-	$(VENV_CONDA)/bin/conda install --yes -c conda-forge -c bioconda $(SNAKEMAKE_VER) \
+conda_venv:
+	rm -rf $(VENV_CONDA)
+	mkdir -p /tmp/$$USER
+	export TMPDIR=/tmp/$$USER && \
+	wget -4 https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh -O miniconda.sh && \
+	bash miniconda.sh -b -u -p $(VENV_CONDA) && \
+	$(VENV_CONDA)/bin/conda install -y python=$(PYTHON_VER) pip
+
+conda_snakemake:
+	$(VENV_CONDA)/bin/conda install -y \
+		-c conda-forge -c bioconda \
+		$(SNAKEMAKE_VER) \
 		snakefmt isort black flake8 mypy pylint pydocstyle samtools
-	echo "installed conda venv with snakemake in $(VENV_CONDA) activate with:"
+
+	echo "installed conda venv with snakemake in $(VENV_CONDA)"
+	echo "activate with:"
 	echo "  source $(VENV_CONDA)/bin/activate"
 
 pip_venv:  ## pip install is much faster and smaller, but missing some advanced snakemake features
